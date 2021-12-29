@@ -83,8 +83,9 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		if( $is_update ){
 			$failed = false;
 			$failed_message = 'Something went wrong during order update to Knawat.com';
-			$whilelisted_status = [ 'Pending', 'Processing', 'Cancelled' ];
-			if (!in_array($order_status, $whilelisted_status)) {
+			// Pending, Processing, Cancelled
+			$whilelisted_status = [1,2,7];
+			if (!in_array($order_status_id, $whilelisted_status)) {
                     return false;
                 }
 			try{
@@ -108,8 +109,8 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		}else{
 			$failed = false;
 			$failed_message = 'Something went wrong during order create on Knawat.com';
-			$push_status = 'Processing';
-			if ($push_status != $order_status) {
+			$push_status = 2; //Processing
+			if ($push_status !== $order_status_id) {
 				return false;
 			}
 			try{

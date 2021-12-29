@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Knawat Dropshipping</name>
-    <version>1.0.6</version>
+    <version>1.0.11</version>
     <author>Knawat Team</author>
-    <link>https://github.com/Knawat</link>
+    <link>https://github.com/Knawat/knawat-dropshipping-opencart</link>
     <code>knawat_dropshipping_left_menu</code>
     <description>Add Knawat Dropshipping link at left menu</description>
     <file path="admin/controller/common/column_left.php">
