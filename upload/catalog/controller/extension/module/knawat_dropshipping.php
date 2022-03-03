@@ -34,6 +34,10 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		$order = $this->model_checkout_order->getOrder($order_id);
 		$order_products = $this->model_account_order->getOrderProducts($order_id);
 
+		$order_statuses['pending'] = $this->config->get('module_knawat_dropshipping_order_pending');
+		$order_statuses['processing'] = $this->config->get('module_knawat_dropshipping_order_processing');
+		$order_statuses['cancelled'] = $this->config->get('module_knawat_dropshipping_order_cancelled');
+		
 		if (!$order) {
 			$this->log->write("Failed to load Order at send order to Knawat.com, getOrder() failed. order_id:" . $order_id);
 			return false;
@@ -62,15 +66,15 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		/**
 		 * @TODO: Check here token is valid or not.
 		 */
-
+		
 		$order_status = $this->model_extension_module_knawat_dropshipping->get_order_status_name( $order_status_id );
 		if( $order_status != '' ){
-			if($order_status == 'Canceled'){
+			if($order_status_id == $order_statuses['cancelled']){
 				$order_status = 'Cancelled';
 			}
 			$order['order_status'] = $order_status;
 		}
-		
+
 		$mp_order = $this->format_order( $order, $order_products, $is_update );
 		if( empty( $mp_order ) ){
 			$this->log->write("Failed to format Order as per MP API at send order to Knawat.com, format_order() failed. order_id:" . $order_id);
@@ -84,7 +88,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			$failed = false;
 			$failed_message = 'Something went wrong during order update to Knawat.com';
 			// Pending, Processing, Cancelled
-			$whilelisted_status = [1,2,7];
+			$whilelisted_status = array_values($order_statuses);
 			if (!in_array($order_status_id, $whilelisted_status)) {
                     return false;
                 }
@@ -109,8 +113,8 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		}else{
 			$failed = false;
 			$failed_message = 'Something went wrong during order create on Knawat.com';
-			$push_status = 2; //Processing
-			if ($push_status !== $order_status_id) {
+			$push_status = $order_statuses['processing']; //Processing
+			if ((int)$push_status !== (int)$order_status_id) {
 				return false;
 			}
 			try{

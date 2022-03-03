@@ -109,6 +109,60 @@
                         </div>
                     </div>
 
+
+                     <div class="form-group">
+                       <label class="col-sm-2" for="">{{ entry_orders_statuses }}</label>
+                       <div class="col-sm-10">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-order-pending-status">{{ entry_order_pending_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="module_knawat_dropshipping_order_pending" id="input-order-pending-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                    {% if order_status.order_status_id == module_knawat_dropshipping_order_pending %}
+                                    <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                    <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    </select>
+                                   
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-order-processing-status">{{ entry_order_processing_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="module_knawat_dropshipping_order_processing" id="input-order-processing-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                    {% if order_status.order_status_id == module_knawat_dropshipping_order_processing %}
+                                    <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                    <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-order-cancelled-status">{{ entry_order_cancelled_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="module_knawat_dropshipping_order_cancelled" id="input-order-cancelled-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                    {% if order_status.order_status_id == module_knawat_dropshipping_order_cancelled %}
+                                    <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                    <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                       </div>
+
+                     </div>
+                  
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{ entry_store }}</label>
                         <div class="col-sm-10">
