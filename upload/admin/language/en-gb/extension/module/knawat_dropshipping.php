@@ -39,6 +39,10 @@ $_['entry_consumer_key']     		= 'Knawat Consumer Key';
 $_['consumer_key_placeholder']		= 'Enter Knawat Consumer Key';
 $_['entry_consumer_secret'] 		= 'Knawat Consumer Secret';
 $_['consumer_secret_placeholder']	= 'Enter Knawat Consumer Secret';
+$_['entry_orders_statuses']	        = 'Order Statuses';
+$_['entry_order_pending_status']	= 'Pending';
+$_['entry_order_processing_status']	= 'Processing';
+$_['entry_order_cancelled_status']	= 'Cancelled';
 $_['entry_store']         			= 'Import Products into these Stores';
 $_['entry_connection']              = 'Connection Status';
 

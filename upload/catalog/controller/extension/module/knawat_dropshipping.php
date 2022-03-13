@@ -34,6 +34,10 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		$order = $this->model_checkout_order->getOrder($order_id);
 		$order_products = $this->model_account_order->getOrderProducts($order_id);
 
+		$order_statuses['pending'] = $this->config->get('module_knawat_dropshipping_order_pending');
+		$order_statuses['processing'] = $this->config->get('module_knawat_dropshipping_order_processing');
+		$order_statuses['cancelled'] = $this->config->get('module_knawat_dropshipping_order_cancelled');
+		
 		if (!$order) {
 			$this->log->write("Failed to load Order at send order to Knawat.com, getOrder() failed. order_id:" . $order_id);
 			return false;
@@ -59,17 +63,21 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			return true;
 		}
 
+		$allowed_statuses = [
+			$order_statuses['pending']		=> 'pending',
+			$order_statuses['processing']	=> 'processing',
+			$order_statuses['cancelled']	=> 'cancelled',
+		];
+
 		/**
 		 * @TODO: Check here token is valid or not.
 		 */
-
-		$order_status = $this->model_extension_module_knawat_dropshipping->get_order_status_name( $order_status_id );
-		if( $order_status != '' ){
-			if($order_status == 'Canceled'){
-				$order_status = 'Cancelled';
-			}
-			$order['order_status'] = $order_status;
+		
+		if(!isset($allowed_statuses[$order_status_id])){
+			return false;
 		}
+		
+		$order['order_status'] = $allowed_statuses[$order_status_id];
 		
 		$mp_order = $this->format_order( $order, $order_products, $is_update );
 		if( empty( $mp_order ) ){
@@ -79,19 +87,18 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 
 		require_once( DIR_SYSTEM . 'library/knawat_dropshipping/knawatmpapi.php' );
 		$knawatapi = new KnawatMPAPI( $this->registry );
-
 		if( $is_update ){
 			$failed = false;
 			$failed_message = 'Something went wrong during order update to Knawat.com';
 			// Pending, Processing, Cancelled
-			$whilelisted_status = [1,2,7];
+			$whilelisted_status = array_values($order_statuses);
 			if (!in_array($order_status_id, $whilelisted_status)) {
                     return false;
                 }
 			try{
 				$result = $knawatapi->put( 'orders/'.$knawat_order_id, $mp_order );
-				if( !empty( $result ) && isset( $result->status ) && 'success' === $result->status ){
-					$korder_id = $result->data->id;
+				if( !empty( $result ) && isset( $result->status ) && 'success' === $result->status && isset($result->data->id)){
+					$order_id = $result->data->id;
 					$this->model_extension_module_knawat_dropshipping->delete_knawat_meta( $order_id, 'knawat_sync_failed', 'order' );
 					}
 				else{
@@ -109,8 +116,8 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		}else{
 			$failed = false;
 			$failed_message = 'Something went wrong during order create on Knawat.com';
-			$push_status = 2; //Processing
-			if ($push_status !== $order_status_id) {
+			$push_status = $order_statuses['processing']; //Processing
+			if ((int)$push_status !== (int)$order_status_id) {
 				return false;
 			}
 			try{
@@ -668,14 +675,6 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
                 exit( json_encode( array( 'error' => 'invalid_CSRF_token' ) ) );
             }
         }
-		/* if (isset($_SERVER['HTTP_REFERER'])) {
-			$server_name = $_SERVER['SERVER_NAME'];
-			if ( false !== stripos( $_SERVER['HTTP_REFERER'], $server_name ) ) {
-				exit( json_encode( array( 'error' => 'Invalid Reffer' ) ) );
-			}
-		} else {
-			exit(json_encode( array( 'error' => 'NO Reffer' ) ) );
-		} */
 
 		$this->load_admin_model();
 		$orders = $this->model_extension_module_knawat_dropshipping->get_sync_failed_orders();

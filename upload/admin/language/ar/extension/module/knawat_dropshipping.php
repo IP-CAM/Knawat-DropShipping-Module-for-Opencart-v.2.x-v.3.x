@@ -40,6 +40,10 @@ $_['entry_consumer_key']     		= 'رقم العميل الخاص بقنوات';
 $_['consumer_key_placeholder']		= 'ادخل رقم العميل الخاص بقنوات';
 $_['entry_consumer_secret'] 		= 'الرقم السري الخاص بقنوات';
 $_['consumer_secret_placeholder']	= 'ادخل الرقم السري الخاص بقنوات';
+$_['entry_orders_statuses']	        = 'حالات الطلب';
+$_['entry_order_pending_status']	= 'معلق';
+$_['entry_order_processing_status']	= 'قيد التنفيذ';
+$_['entry_order_cancelled_status']	= 'ملغي';
 $_['entry_store']         			= 'استيراد المنتجات لهذه المتاجر';
 $_['entry_connection']              = 'وضع الاتصال';
 

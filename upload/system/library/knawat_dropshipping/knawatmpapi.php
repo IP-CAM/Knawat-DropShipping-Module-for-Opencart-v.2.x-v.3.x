@@ -301,7 +301,6 @@
 
         // Execute the request and decode the response to JSON
         $resource_data = json_decode( curl_exec( $this->ch ) );
-        //print_r(  $resource_data );
 
         // Retrieve the HTTP response code
         $response_code = (int) curl_getinfo( $this->ch, CURLINFO_HTTP_CODE );
@@ -328,7 +327,7 @@
             return array( 
                 $resource_data, 
                 $curl_request_url,
-                $request_form_data,
+                $data,
                 $response_data,
                 $curl_info
             ); 
