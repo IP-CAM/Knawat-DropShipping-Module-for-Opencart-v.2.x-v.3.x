@@ -18,17 +18,6 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			/**
 		 	* Add Events
 		 	*/
-			$this->model_extension_event->addEvent(
-				'knawat_dropshipping_add_to_cart',
-				'catalog/controller/checkout/cart/add/before',
-				'extension/module/knawat_dropshipping/before_add_to_cart'
-			);
-
-			$this->model_extension_event->addEvent(
-				'knawat_dropshipping_single_product',
-				'catalog/controller/product/product/after',
-				'extension/module/knawat_dropshipping/after_single_product'
-			);
 
 			$this->model_extension_event->addEvent(
             	'knawat_dropshipping_order_changed',
@@ -43,18 +32,6 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			/**
 		 	* Add Events
 		 	*/
-			$this->model_setting_event->addEvent(
-				'knawat_dropshipping_add_to_cart',
-				'catalog/controller/checkout/cart/add/before',
-				'extension/module/knawat_dropshipping/before_add_to_cart'
-			);
-
-			$this->model_setting_event->addEvent(
-				'knawat_dropshipping_single_product',
-				'catalog/controller/product/product/after',
-				'extension/module/knawat_dropshipping/after_single_product'
-			);
-
 			$this->model_setting_event->addEvent(
             	'knawat_dropshipping_order_changed',
             	'catalog/model/checkout/order/addOrderHistory/after',
