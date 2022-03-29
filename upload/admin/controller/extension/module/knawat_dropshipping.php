@@ -174,7 +174,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			'consumer_secret_placeholder' 	=> $this->language->get('consumer_secret_placeholder'),
 			'entry_orders_statuses' 		=> $this->language->get('entry_orders_statuses'),
 			'entry_order_pending_status' 	=> $this->language->get('entry_order_pending_status'),
-			'entry_order_pricessing_status' => $this->language->get('entry_order_pricessing_status'),
+			'entry_order_processing_status' => $this->language->get('entry_order_processing_status'),
 			'entry_order_cancelled_status' 	=> $this->language->get('entry_order_cancelled_status'),
 		);
 
@@ -275,7 +275,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		$this->load->model('localisation/order_status');
 
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
-
+				// Use default statuses for first time 
 		$data['module_knawat_dropshipping_order_pending'] = $this->config->get('module_knawat_dropshipping_order_pending')?:$this->default_order_status_id($data['order_statuses'],'Pending');
 		$data['module_knawat_dropshipping_order_processing'] = $this->config->get('module_knawat_dropshipping_order_processing')?:$this->default_order_status_id($data['order_statuses'],'Processing');
 		$data['module_knawat_dropshipping_order_cancelled'] = $this->config->get('module_knawat_dropshipping_order_cancelled')?:$this->default_order_status_id($data['order_statuses'],'Canceled');
@@ -285,7 +285,6 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 			$data['module_knawat_dropshipping_order_processing'] = $this->request->post['module_knawat_dropshipping_order_processing'];
 			$data['module_knawat_dropshipping_order_cancelled'] = $this->request->post['module_knawat_dropshipping_order_cancelled'];
 		}
-
 
 		// Setup Stores.
 		$this->load->model('setting/store');

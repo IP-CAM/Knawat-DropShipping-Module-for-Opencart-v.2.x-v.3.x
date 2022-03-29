@@ -675,14 +675,6 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
                 exit( json_encode( array( 'error' => 'invalid_CSRF_token' ) ) );
             }
         }
-		/* if (isset($_SERVER['HTTP_REFERER'])) {
-			$server_name = $_SERVER['SERVER_NAME'];
-			if ( false !== stripos( $_SERVER['HTTP_REFERER'], $server_name ) ) {
-				exit( json_encode( array( 'error' => 'Invalid Reffer' ) ) );
-			}
-		} else {
-			exit(json_encode( array( 'error' => 'NO Reffer' ) ) );
-		} */
 
 		$this->load_admin_model();
 		$orders = $this->model_extension_module_knawat_dropshipping->get_sync_failed_orders();
