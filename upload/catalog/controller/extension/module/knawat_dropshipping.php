@@ -315,6 +315,56 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		return false;
 	}
 
+	/**
+	 * Action trigger after called single product page. 
+	 */
+	public function after_single_product(){
+		if( isset( $this->request->get['product_id'] ) && !empty( $this->request->get['product_id'] ) ){
+			if( $this->is_knawat_product( $this->request->get['product_id'] ) ){
+				$action_url = $this->url->link( $this->route.'/sync_product_by_id/&product_id='.(int)$this->request->get['product_id'] );
+				$this->curl_async( $action_url );
+			}
+		}
+	}
+
+	/**
+	 * Action trigger Just before add to cart.
+	 */
+	public function before_add_to_cart(){
+		if( isset( $this->request->post['product_id'] ) && !empty( $this->request->post['product_id'] ) ){
+			if( $this->is_knawat_product( (int)$this->request->post['product_id'] ) ){
+				$action_url = $this->url->link( $this->route.'/sync_product_by_id/&product_id='.(int)$this->request->post['product_id'] );
+				$this->curl_async( $action_url );
+			}
+		}
+	}
+
+	private function curl_async( $url, $data = array() ){
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url );
+		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1000 );
+		curl_exec($ch);
+		curl_close($ch);
+	}
+
+	/**
+	 * update product stock and price from Knawat.com
+	 */
+	public function sync_product_by_id(){
+		/** 
+		 * @TODO: Add a token security for this call
+		 */
+		if( isset( $this->request->get['product_id'] ) && !empty( $this->request->get['product_id'] ) ){
+			$product_id = $this->request->get['product_id'];
+			if( !empty( $product_id ) ){
+				// import product
+				require_once( DIR_SYSTEM . 'library/knawat_dropshipping/knawatimporter.php' );
+				$knawatimporter = new KnawatImporter( $this->registry, array( 'product_id'=> $product_id ), 'single' );
+				$import_results = $knawatimporter->import();
+			}
+		}
+	}
 
 	/**
 	 * Order Invoice
@@ -625,6 +675,14 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
                 exit( json_encode( array( 'error' => 'invalid_CSRF_token' ) ) );
             }
         }
+		/* if (isset($_SERVER['HTTP_REFERER'])) {
+			$server_name = $_SERVER['SERVER_NAME'];
+			if ( false !== stripos( $_SERVER['HTTP_REFERER'], $server_name ) ) {
+				exit( json_encode( array( 'error' => 'Invalid Reffer' ) ) );
+			}
+		} else {
+			exit(json_encode( array( 'error' => 'NO Reffer' ) ) );
+		} */
 
 		$this->load_admin_model();
 		$orders = $this->model_extension_module_knawat_dropshipping->get_sync_failed_orders();

@@ -364,8 +364,9 @@ class ModelExtensionModuleKnawatDropshipping extends Model {
 
             $attributes = array();
             $varients = array();
+            $stockOptions = [];
             foreach ( $variations as $variation ) {
-            if(($variation->quantity > 0 && !$update) || ($update)){
+            if(($variation->quantity > 0 && !$update) || $update){
                 if( isset( $variation->attributes ) && !empty( $variation->attributes ) ){
                         foreach ( $variation->attributes as $attribute ) {
                         $attribute_names = (array) $attribute->name;
@@ -397,8 +398,17 @@ class ModelExtensionModuleKnawatDropshipping extends Model {
                             $attributes[ $option_name ]['name'] = $attribute_names;
                             $attributes[ $option_name ]['values'][$option_value_name] = $attribute_options;
                         }
+                        if($variation->quantity > 0){
+                            $stockOptions[$option_name.'_'.$option_value_name] = $variation->quantity;
+                        }
+
                         $varients[ $option_name ][$option_value_name]['price'] = isset( $variation->sale_price ) ? $variation->sale_price : 0;
-                        $varients[ $option_name ][$option_value_name]['quantity'] = isset( $variation->quantity ) ? $variation->quantity : 0;
+                        $quantity = isset( $variation->quantity ) ? $variation->quantity : 0;
+                        
+                        if( !$quantity && array_key_exists($option_name.'_'.$option_value_name,$stockOptions) ){
+                            $quantity=$stockOptions[$option_name.'_'.$option_value_name];
+                        }
+                        $varients[ $option_name ][$option_value_name]['quantity'] = $quantity;
                         $varients[ $option_name ][$option_value_name]['sku'] = isset( $variation->sku ) ? $variation->sku : '';
                     }
                 }
