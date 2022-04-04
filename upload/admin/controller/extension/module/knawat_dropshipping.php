@@ -275,7 +275,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		$this->load->model('localisation/order_status');
 
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
-				// Use default statuses for first time 
+		// Use default statuses for first time 
 		$data['module_knawat_dropshipping_order_pending'] = $this->config->get('module_knawat_dropshipping_order_pending')?:$this->default_order_status_id($data['order_statuses'],'Pending');
 		$data['module_knawat_dropshipping_order_processing'] = $this->config->get('module_knawat_dropshipping_order_processing')?:$this->default_order_status_id($data['order_statuses'],'Processing');
 		$data['module_knawat_dropshipping_order_cancelled'] = $this->config->get('module_knawat_dropshipping_order_cancelled')?:$this->default_order_status_id($data['order_statuses'],'Canceled');
