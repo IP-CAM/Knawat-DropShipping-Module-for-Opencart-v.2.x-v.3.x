@@ -1,13 +1,13 @@
 <?php
-class ControllerExtensionModuleKnawatDropshipping extends Controller { 
-	
+class ControllerExtensionModuleKnawatDropshipping extends Controller {
+
 	private $error = array();
 	private $route = 'extension/module/knawat_dropshipping';
 
 	public function __construct($registry) {
         parent::__construct($registry);
 	}
-	
+
 	public function index() {
 		// Do nothing here.
 	}
@@ -37,7 +37,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		$order_statuses['pending'] = $this->config->get('module_knawat_dropshipping_order_pending');
 		$order_statuses['processing'] = $this->config->get('module_knawat_dropshipping_order_processing');
 		$order_statuses['cancelled'] = $this->config->get('module_knawat_dropshipping_order_cancelled');
-		
+
 		if (!$order) {
 			$this->log->write("Failed to load Order at send order to Knawat.com, getOrder() failed. order_id:" . $order_id);
 			return false;
@@ -72,13 +72,13 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 		/**
 		 * @TODO: Check here token is valid or not.
 		 */
-		
+
 		if(!isset($allowed_statuses[$order_status_id])){
 			return false;
 		}
-		
+
 		$order['order_status'] = $allowed_statuses[$order_status_id];
-		
+
 		$mp_order = $this->format_order( $order, $order_products, $is_update );
 		if( empty( $mp_order ) ){
 			$this->log->write("Failed to format Order as per MP API at send order to Knawat.com, format_order() failed. order_id:" . $order_id);
@@ -226,7 +226,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 	 */
 	private function get_knawat_order_product( $order_products, $is_update = false ){
 
-		$knawat_products = array();
+		$orderItems = [];
 		foreach( $order_products as $product ){
 			$is_knawat = $this->is_knawat_product( $product );
 			if( $is_knawat ){
@@ -243,26 +243,28 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 					$knawat_products[] = $temp;
 				}else{
 					$product_options = $product['order_options'];
+                    $variantSku = '';
 					foreach( $product_options as $option ){
 						$product_option_sku = $this->model_extension_module_knawat_dropshipping->get_knawat_meta( $option['product_option_value_id'], 'sku', 'product_option_value' );
-						if( $product_option_sku != '' ){
-							$this->model_extension_module_knawat_dropshipping->update_knawat_meta( $product['order_product_id'], 'sku', $product_option_sku, 'order_product' );
-							break;
-						}
+                        $variantSku = $product_option_sku;
 					}
-					if( !$product_option_sku ){
-						// Get SKU based on product ID (if its not there for options )
-						$product_option_sku = isset( $product['model'] ) ? $product['model'] : '';
+					if( !$variantSku ){
+                        // Get SKU based on product ID (if its not there for options )
+                        $variantSku = isset( $product['model'] ) ? $product['model'] : '';
 					}
-					$temp = array(
-						'quantity'	=> $product['quantity'],
-						'sku'		=> $product_option_sku
-					);
-					$knawat_products[] = $temp;
+					// SET variant SKU to use on order update.
+                    if( $variantSku ){
+                        $this->model_extension_module_knawat_dropshipping->update_knawat_meta( $product['order_product_id'], 'sku', $variantSku, 'order_product' );
+                    }
+
+                    $orderItems[] = [
+                        'quantity'	=> $product['quantity'],
+                        'sku'		=> $variantSku
+                    ];
 				}
 			}
 		}
-		return $knawat_products;
+		return $orderItems;
 	}
 
 	/**
@@ -316,7 +318,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 	}
 
 	/**
-	 * Action trigger after called single product page. 
+	 * Action trigger after called single product page.
 	 */
 	public function after_single_product(){
 		if( isset( $this->request->get['product_id'] ) && !empty( $this->request->get['product_id'] ) ){
@@ -352,7 +354,7 @@ class ControllerExtensionModuleKnawatDropshipping extends Controller {
 	 * update product stock and price from Knawat.com
 	 */
 	public function sync_product_by_id(){
-		/** 
+		/**
 		 * @TODO: Add a token security for this call
 		 */
 		if( isset( $this->request->get['product_id'] ) && !empty( $this->request->get['product_id'] ) ){
